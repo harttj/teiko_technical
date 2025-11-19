@@ -81,6 +81,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ad/e7/4642b7f462381799393fbad894ba4b32db00870a797f0616c197b07129a9/black-23.3.0-py3-none-any.whl", hash = "sha256:ec751418022185b0c1bb7d7736e6933d40bbb14c14a0abcf9123d1b159f98dd4", size = 180965, upload-time = "2023-03-29T01:00:52.253Z" },
 ]
 
+[package.optional-dependencies]
+jupyter = [
+    { name = "ipython", version = "7.34.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "tokenize-rt", version = "5.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+]
+
 [[package]]
 name = "black"
 version = "24.8.0"
@@ -120,6 +126,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/27/25/3f706b4f044dd569a20a4835c3b733dedea38d83d2ee0beb8178a6d44945/black-24.8.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9e84e33b37be070ba135176c123ae52a51f82306def9f7d063ee302ecab2cf47", size = 1756488, upload-time = "2024-08-02T17:46:08.067Z" },
     { url = "https://files.pythonhosted.org/packages/63/72/79375cd8277cbf1c5670914e6bd4c1b15dea2c8f8e906dc21c448d0535f0/black-24.8.0-cp39-cp39-win_amd64.whl", hash = "sha256:73bbf84ed136e45d451a260c6b73ed674652f90a2b3211d6a35e78054563a9bb", size = 1417721, upload-time = "2024-08-02T17:46:42.637Z" },
     { url = "https://files.pythonhosted.org/packages/27/1e/83fa8a787180e1632c3d831f7e58994d7aaf23a0961320d21e84f922f919/black-24.8.0-py3-none-any.whl", hash = "sha256:972085c618ee94f402da1af548a4f218c754ea7e5dc70acb168bfaca4c2542ed", size = 206504, upload-time = "2024-08-02T17:43:15.747Z" },
+]
+
+[package.optional-dependencies]
+jupyter = [
+    { name = "ipython", version = "8.12.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "tokenize-rt", version = "6.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
 ]
 
 [[package]]
@@ -170,6 +182,14 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ca/6f/1a3859a7da205f3d50cf3a8bec6bdc551a91c33ae77a045bb24c1f46ab54/black-25.11.0-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:92285c37b93a1698dcbc34581867b480f1ba3a7b92acf1fe0467b04d7a4da0dc", size = 1655678, upload-time = "2025-11-10T01:57:09.028Z" },
     { url = "https://files.pythonhosted.org/packages/56/1a/6dec1aeb7be90753d4fcc273e69bc18bfd34b353223ed191da33f7519410/black-25.11.0-cp39-cp39-win_amd64.whl", hash = "sha256:43945853a31099c7c0ff8dface53b4de56c41294fa6783c0441a8b1d9bf668bc", size = 1347452, upload-time = "2025-11-10T01:57:01.871Z" },
     { url = "https://files.pythonhosted.org/packages/00/5d/aed32636ed30a6e7f9efd6ad14e2a0b0d687ae7c8c7ec4e4a557174b895c/black-25.11.0-py3-none-any.whl", hash = "sha256:e3f562da087791e96cefcd9dda058380a442ab322a02e222add53736451f604b", size = 204918, upload-time = "2025-11-10T01:53:48.917Z" },
+]
+
+[package.optional-dependencies]
+jupyter = [
+    { name = "ipython", version = "8.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "ipython", version = "8.37.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
+    { name = "ipython", version = "9.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tokenize-rt", version = "6.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 
 [[package]]
@@ -1052,6 +1072,58 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ef/4c/5dd1d8af08107f88c7f741ead7a40854b8ac24ddf9ae850afbcf698aa552/ipython_pygments_lexers-1.1.1.tar.gz", hash = "sha256:09c0138009e56b6854f9535736f4171d855c8c08a563a0dcd8022f78355c7e81", size = 8393, upload-time = "2025-01-17T11:24:34.505Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d9/33/1f075bf72b0b747cb3288d011319aaf64083cf2efef8354174e3ed4540e2/ipython_pygments_lexers-1.1.1-py3-none-any.whl", hash = "sha256:a9462224a505ade19a605f71f8fa63c2048833ce50abc86768a0d81d876dc81c", size = 8074, upload-time = "2025-01-17T11:24:33.271Z" },
+]
+
+[[package]]
+name = "isort"
+version = "5.11.5"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.8'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/67/63/18cc5c2f9084d3f91ce704f2b5c8e17bedd777244e7732c21a31992b0a78/isort-5.11.5.tar.gz", hash = "sha256:6be1f76a507cb2ecf16c7cf14a37e41609ca082330be4e3436a18ef74add55db", size = 187953, upload-time = "2023-01-30T09:45:12.146Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5f/f6/c55db45970fbd14de6ab72082f1b8a143c3a69aa031c1e0dd4b9ecc8d496/isort-5.11.5-py3-none-any.whl", hash = "sha256:ba1d72fb2595a01c7895a5128f9585a5cc4b6d395f1c8d514989b9a7eb2a8746", size = 104094, upload-time = "2023-01-30T09:45:09.902Z" },
+]
+
+[[package]]
+name = "isort"
+version = "5.13.2"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.8.*'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/87/f9/c1eb8635a24e87ade2efce21e3ce8cd6b8630bb685ddc9cdaca1349b2eb5/isort-5.13.2.tar.gz", hash = "sha256:48fdfcb9face5d58a4f6dde2e72a1fb8dcaf8ab26f95ab49fab84c2ddefb0109", size = 175303, upload-time = "2023-12-13T20:37:26.124Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/b3/8def84f539e7d2289a02f0524b944b15d7c75dab7628bedf1c4f0992029c/isort-5.13.2-py3-none-any.whl", hash = "sha256:8ca5e72a8d85860d5a3fa69b8745237f2939afe12dbf656afbcb47fe72d947a6", size = 92310, upload-time = "2023-12-13T20:37:23.244Z" },
+]
+
+[[package]]
+name = "isort"
+version = "6.1.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.9.*'",
+]
+dependencies = [
+    { name = "importlib-metadata", version = "8.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/82/fa43935523efdfcce6abbae9da7f372b627b27142c3419fcf13bf5b0c397/isort-6.1.0.tar.gz", hash = "sha256:9b8f96a14cfee0677e78e941ff62f03769a06d412aabb9e2a90487b3b7e8d481", size = 824325, upload-time = "2025-10-01T16:26:45.027Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/cc/9b681a170efab4868a032631dea1e8446d8ec718a7f657b94d49d1a12643/isort-6.1.0-py3-none-any.whl", hash = "sha256:58d8927ecce74e5087aef019f778d4081a3b6c98f15a80ba35782ca8a2097784", size = 94329, upload-time = "2025-10-01T16:26:43.291Z" },
+]
+
+[[package]]
+name = "isort"
+version = "7.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version == '3.10.*'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/63/53/4f3c058e3bace40282876f9b553343376ee687f3c35a525dc79dbd450f88/isort-7.0.0.tar.gz", hash = "sha256:5513527951aadb3ac4292a41a16cbc50dd1642432f5e8c20057d414bdafb4187", size = 805049, upload-time = "2025-10-11T13:30:59.107Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/ed/e3705d6d02b4f7aea715a353c8ce193efd0b5db13e204df895d38734c244/isort-7.0.0-py3-none-any.whl", hash = "sha256:1bcabac8bc3c36c7fb7b98a76c8abb18e0f841a3ba81decac7691008592499c1", size = 94672, upload-time = "2025-10-11T13:30:57.665Z" },
 ]
 
 [[package]]
@@ -2190,6 +2262,17 @@ dependencies = [
     { name = "pytest", version = "9.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "black", version = "23.3.0", source = { registry = "https://pypi.org/simple" }, extra = ["jupyter"], marker = "python_full_version < '3.8'" },
+    { name = "black", version = "24.8.0", source = { registry = "https://pypi.org/simple" }, extra = ["jupyter"], marker = "python_full_version == '3.8.*'" },
+    { name = "black", version = "25.11.0", source = { registry = "https://pypi.org/simple" }, extra = ["jupyter"], marker = "python_full_version >= '3.9'" },
+    { name = "isort", version = "5.11.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
+    { name = "isort", version = "5.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.8.*'" },
+    { name = "isort", version = "6.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "isort", version = "7.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "black", version = "23.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
@@ -2210,7 +2293,12 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pytest", specifier = ">=7.4.4" }]
+requires-dist = [
+    { name = "black", extras = ["jupyter"], marker = "extra == 'dev'" },
+    { name = "isort", marker = "extra == 'dev'" },
+    { name = "pytest", specifier = ">=7.4.4" },
+]
+provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2218,6 +2306,44 @@ dev = [
     { name = "ipykernel", specifier = ">=6.16.2" },
     { name = "pre-commit", specifier = ">=2.21.0" },
     { name = "pytest", specifier = ">=7.4.4" },
+]
+
+[[package]]
+name = "tokenize-rt"
+version = "5.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.8'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/40/01/fb40ea8c465f680bf7aa3f5bee39c62ba8b7f52c38048c27aa95aff4f779/tokenize_rt-5.0.0.tar.gz", hash = "sha256:3160bc0c3e8491312d0485171dea861fc160a240f5f5766b72a1165408d10740", size = 5329, upload-time = "2022-10-03T23:28:00.861Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/12/4c7495f25b4c9131706f3aaffb185d4de32c02a6ee49d875e929c5b7c919/tokenize_rt-5.0.0-py2.py3-none-any.whl", hash = "sha256:c67772c662c6b3dc65edf66808577968fb10badfc2042e3027196bed4daf9e5a", size = 5848, upload-time = "2022-10-03T23:27:59.459Z" },
+]
+
+[[package]]
+name = "tokenize-rt"
+version = "6.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.8.*'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7d/09/6257dabdeab5097d72c5d874f29b33cd667ec411af6667922d84f85b79b5/tokenize_rt-6.0.0.tar.gz", hash = "sha256:b9711bdfc51210211137499b5e355d3de5ec88a85d2025c520cbb921b5194367", size = 5360, upload-time = "2024-08-04T21:01:19.405Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5c/c2/44486862562c6902778ccf88001ad5ea3f8da5c030c638cac8be72f65b40/tokenize_rt-6.0.0-py2.py3-none-any.whl", hash = "sha256:d4ff7ded2873512938b4f8cbb98c9b07118f01d30ac585a30d7a88353ca36d22", size = 5869, upload-time = "2024-08-04T21:01:17.84Z" },
+]
+
+[[package]]
+name = "tokenize-rt"
+version = "6.2.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.11'",
+    "python_full_version == '3.10.*'",
+    "python_full_version == '3.9.*'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/69/ed/8f07e893132d5051d86a553e749d5c89b2a4776eb3a579b72ed61f8559ca/tokenize_rt-6.2.0.tar.gz", hash = "sha256:8439c042b330c553fdbe1758e4a05c0ed460dbbbb24a606f11f0dee75da4cad6", size = 5476, upload-time = "2025-05-23T23:48:00.035Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/f0/3fe8c6e69135a845f4106f2ff8b6805638d4e85c264e70114e8126689587/tokenize_rt-6.2.0-py2.py3-none-any.whl", hash = "sha256:a152bf4f249c847a66497a4a95f63376ed68ac6abf092a2f7cfb29d044ecff44", size = 6004, upload-time = "2025-05-23T23:47:58.812Z" },
 ]
 
 [[package]]
