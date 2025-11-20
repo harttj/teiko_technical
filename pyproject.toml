@@ -3,10 +3,11 @@ name = "teiko-technical"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
     "dash>=2.15.0",
     "pytest>=7.4.4",
+    "pandas>=2.3.3",
 ]
 
 [dependency-groups]
