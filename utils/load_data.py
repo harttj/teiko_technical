@@ -56,7 +56,6 @@ def get_data(
     data will be retrieved from that table only.
     NOTE: If query is provided, it will be used directly and other parameters will be ignored.
 
-    params:
     :param sample_cols: Comma-separated string of sample data columns to retrieve.
                         Use "*" to retrieve all columns. Or "" to skip sample data.
     :param metadata_cols: Comma-separated string of metadata columns to retrieve.
