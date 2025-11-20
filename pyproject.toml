@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
+    "dash>=2.15.0",
     "pytest>=7.4.4",
 ]
 
@@ -21,3 +22,11 @@ dev = [
     "black[jupyter]",
     "isort",
 ]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["data*", "db*", "tests*"]
