@@ -184,10 +184,20 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Load cell-count CSV into SQLite DB")
-    parser.add_argument("csv", help="path to cell-count.csv")
     parser.add_argument(
-        "db", help="path to sqlite db file to create", default=DEFAULT_DB_PATH
+        "csv",
+        nargs="?",
+        help="path to cell-count.csv",
+        default="data/cell-count.csv",
     )
-    parser.add_argument("--replace", action="store_true", help="replace existing db")
+    parser.add_argument(
+        "db",
+        nargs="?",
+        help="path to sqlite db file to create",
+        default=str(DEFAULT_DB_PATH),
+    )
+    parser.add_argument(
+        "--replace", action="store_true", help="replace existing db", default=False
+    )
     args = parser.parse_args()
     load_csv_to_sqlite(args.csv, args.db, replace_db=args.replace)

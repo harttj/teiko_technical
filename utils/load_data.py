@@ -19,23 +19,28 @@ def _get_existing_cols(conn: sqlite3.Connection, table: str, columns: str) -> st
     cursor = conn.cursor()
     cursor.execute(f"PRAGMA table_info({table})")
     cols_info = cursor.fetchall()
-    table_cols = [col[1] for col in cols_info]
+    table_cols = [c[1] for c in cols_info]
 
-    col_dict = {"exisiting": "", "missing": ""}
-    cols_to_check = [c.strip().lower() for c in columns.split(",")]
+    # Map lowercase column names to their original forms for case-insensitive matching
+    table_cols_map = {c.lower(): c for c in table_cols}
 
-    len_table_cols = len(table_cols)
+    cols_to_check = [c.strip() for c in columns.split(",") if c.strip()]
+    existing = []
+    missing = []
 
-    for table_col in table_cols:
-        if table_col.lower() in cols_to_check:
-            col_dict["exisiting"] += table_col + ", "
+    for req in cols_to_check:
+        key = req.lower()
+        if key in table_cols_map:
+            existing.append(table_cols_map[key])
         else:
-            col_dict["missing"] += table_col + ", "
+            missing.append(req)
 
-    print(
-        f"Didn't find the following columns in table '{table}': {', '.join(col_dict['missing'])}"
-    )
-    return col_dict["exisiting"].rstrip(", ")
+    if missing:
+        print(
+            f"Didn't find the following requested columns in table '{table}': {', '.join(missing)}"
+        )
+
+    return ", ".join(existing)
 
 
 def get_data(
