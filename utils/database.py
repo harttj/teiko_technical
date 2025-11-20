@@ -19,7 +19,9 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
-SCHEMA_SQL = """
+METADATA_ID_COL = "metadata_id"
+SCHEMA_SQL = f"""
+
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS metadata (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +38,7 @@ CREATE TABLE IF NOT EXISTS metadata (
 CREATE TABLE IF NOT EXISTS samples (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	sample_code TEXT NOT NULL UNIQUE,
-	metadata_id INTEGER NOT NULL REFERENCES metadata(id),
+	{METADATA_ID_COL} INTEGER NOT NULL REFERENCES metadata(id),
 	sample_type TEXT,
 	time_from_treatment_start INTEGER,
 	b_cell INTEGER,
@@ -47,6 +49,8 @@ CREATE TABLE IF NOT EXISTS samples (
 );
 COMMIT;
 """
+
+DEFAULT_DB_PATH = Path("data/cell_counts.db")
 
 
 def init_db(db_path: str | Path) -> None:
@@ -104,14 +108,15 @@ def _get_metadata_id(
 
 
 def load_csv_to_sqlite(
-    csv_path: str | Path, db_path: str | Path, replace_db: bool = False
+    csv_path: str | Path,
+    db_path: str | Path = DEFAULT_DB_PATH,
+    replace_db: bool = False,
 ) -> None:
     """Load the CSV file into the SQLite database.
 
-    Args:
-            csv_path: path to `cell-count.csv`.
-            db_path: path to sqlite db file to create/use.
-            replace_db: if True, remove existing DB and create fresh.
+    :param csv_path: path to `cell-count.csv`.
+    :param db_path: path to sqlite db file to create/use.
+    :param replace_db: if True, remove existing DB and create fresh.
     """
     csv_path = Path(csv_path)
     db_path = Path(db_path)
@@ -180,7 +185,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Load cell-count CSV into SQLite DB")
     parser.add_argument("csv", help="path to cell-count.csv")
-    parser.add_argument("db", help="path to sqlite db file to create")
+    parser.add_argument(
+        "db", help="path to sqlite db file to create", default=DEFAULT_DB_PATH
+    )
     parser.add_argument("--replace", action="store_true", help="replace existing db")
     args = parser.parse_args()
     load_csv_to_sqlite(args.csv, args.db, replace_db=args.replace)
