@@ -2924,7 +2924,7 @@ wheels = [
 [[package]]
 name = "teiko-technical"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "dash", version = "2.15.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.8'" },
     { name = "dash", version = "3.3.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.8'" },
