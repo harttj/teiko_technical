@@ -11,13 +11,28 @@ POPULATION_COLS = ["b_cell", "cd8_t_cell", "cd4_t_cell", "nk_cell", "monocyte"]
 
 
 def get_rel_freq_table(
-    population_cols: list[str] = POPULATION_COLS, sample_code_col: str = SAMPLE_CODE_COL
+    df: pd.DataFrame,
+    population_cols: list[str] = POPULATION_COLS,
+    sample_code_col: str = SAMPLE_CODE_COL,
 ) -> pd.DataFrame:
     """Get the relative frequency table of cell counts."""
+    # determine id columns (metadata + sample_code)
+    id_cols = list(set([col for col in df.columns if col not in population_cols]))
 
-    id_cols = [col for col in df.columns if col not in population_cols]
-    df_long = df.reset_index().melt(
-        id_vars=id_cols,
+    # make sure the sample_code_col is included in id_cols (needed for grouping later)
+    if sample_code_col in df.columns and sample_code_col not in id_cols:
+        id_cols.insert(0, sample_code_col)
+
+    # Filter population_cols to those actually present in the dataframe
+    population_cols = [c for c in population_cols if c in df.columns]
+
+    # drop duplicate columns if any (keep first occurrence) to avoid key collisions
+    temp_df = df.copy()
+    # temp_df = temp_df.loc[:, ~temp_df.columns.duplicated()]
+
+    df_long = pd.melt(
+        temp_df,
+        id_vars=[c for c in id_cols if c in temp_df.columns] or None,
         value_vars=population_cols,
         var_name="population",
         value_name="count",
@@ -40,6 +55,6 @@ if __name__ == "__main__":
 
     sample_cols = ",".join([SAMPLE_CODE_COL] + POPULATION_COLS)
     df = get_data(sample_cols=sample_cols, metadata_cols="")
-    rel_freq_table = get_rel_freq_table()
+    rel_freq_table = get_rel_freq_table(df)
     rel_freq_table.to_csv(save_path, index=False)
     print(f"Relative frequency table saved to {save_path}")
