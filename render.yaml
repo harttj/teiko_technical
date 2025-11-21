@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: teiko_technical_dashboard
+    env: python
+    buildCommand: |
+      curl -LsSf https://astral.sh/uv/install.sh | sh
+      uv sync --locked
+    startCommand: |
+      uv run gunicorn app:server
+    plan: free
