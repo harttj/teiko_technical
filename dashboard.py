@@ -317,19 +317,7 @@ def update_subset_analysis_note(
     if dff.empty:
         return html.H5("No data for selected filters.")
 
-    print(len(dff))
-    print(
-        dff["time_from_treatment_start"].value_counts(),
-        dff["time_from_treatment_start"].dtypes,
-    )
-
     dff_tp = dff[dff["time_from_treatment_start"] == timepoint_value].copy()
-    print(timepoint_value, type(timepoint_value))
-    print(
-        dff_tp["time_from_treatment_start"].unique(),
-        dff_tp["time_from_treatment_start"].dtypes,
-    )
-    print(len(dff_tp))
 
     # Build structured output: only the leading label is bold
     header = html.H1(
