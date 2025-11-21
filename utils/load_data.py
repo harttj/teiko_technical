@@ -85,7 +85,7 @@ def get_data(
         metadata_cols = resolve(metadata_cols, "metadata")
 
         # Build SELECT clause
-        select_parts = [c for c in (sample_cols, metadata_cols) if c]
+        select_parts = list(set([c for c in (sample_cols, metadata_cols) if c]))
         select_sql = ", ".join(select_parts)
 
         # Build FROM/JOIN clause
@@ -101,4 +101,4 @@ def get_data(
 
         query = f"SELECT {select_sql} {from_sql}"
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn).drop(columns=["id"], errors="ignore")
