@@ -1,3 +1,11 @@
+"""
+Statistical utility functions for data analysis.
+
+This module provides functions for performing statistical tests,
+specifically Welch's t-test for independent samples and the
+Benjamini-Hochberg procedure for false discovery rate correction.
+"""
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -10,9 +18,16 @@ def compute_welch_bh(
     response_col: str = "response",
     responder_val: str = "yes",
 ) -> pd.DataFrame:
-    """Compute Welch two-sample t-test (responder vs non-responder) per group and apply BH correction.
+    """
+    Compute Welch two-sample t-test (responder vs non-responder) per group and apply BH correction.
+    Along with the Cohen's d effect size.
 
-    Returns a DataFrame with columns: group, t_stat, p_value, p_adj, d
+    :param df: The dataframe containing the data.
+    :param group_col: The column to group by.
+    :param value_col: The column containing values to analyze.
+    :param response_col: The column containing response labels.
+    :param responder_val: The value indicating a responder.
+    :return: A DataFrame with columns: group, t_stat, p_value, p_adj, d
     """
     groups = []
     t_stats = []

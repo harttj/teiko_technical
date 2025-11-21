@@ -53,7 +53,11 @@ DEFAULT_DB_PATH = Path("data/cell_counts.db")
 
 
 def init_db(db_path: str | Path) -> None:
-    """Create the database file and tables if they don't exist."""
+    """
+    Create the database file and tables if they don't exist.
+
+    :param db_path: Path to the SQLite database file.
+    """
     db_path = Path(db_path)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(db_path))
@@ -67,7 +71,15 @@ def init_db(db_path: str | Path) -> None:
 def _get_metadata_id(
     cursor: sqlite3.Cursor, project: str, subject: str, row: dict
 ) -> int:
-    """Insert or lookup a metadata row and return its id."""
+    """
+    Insert or lookup a metadata row and return its id.
+
+    :param cursor: SQLite cursor object.
+    :param project: The project name.
+    :param subject: The subject identifier.
+    :param row: A dictionary containing row data.
+    :return: The metadata ID.
+    """
     cursor.execute(
         "SELECT id FROM metadata WHERE project = ? AND subject = ?",
         (project, subject),

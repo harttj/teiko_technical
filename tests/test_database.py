@@ -1,3 +1,11 @@
+"""
+Tests for database initialization and CSV loading utilities.
+
+This module contains tests for the database module, verifying that
+the SQLite database can be initialized and populated from CSV files.
+"""
+
+
 def test_placeholder():
     """Placeholder test to ensure pytest can find and run tests."""
     assert True

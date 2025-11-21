@@ -19,7 +19,7 @@ This repository contains the code, data, and documentation for the **Teiko Techn
 
 ## Overview
 
-This project contains a dashboard that relies on an internally created sql database. It includes:
+This project contains a dashboard that relies on an internally created SQL database. It includes:
 
 - A schema definition & setup script  
 - Python script to compute analytics (e.g., relative frequency tables)  
@@ -32,13 +32,15 @@ This project contains a dashboard that relies on an internally created sql datab
 
 ### Prerequisites
 
-- Python ≥ 11.4
+- Python ≥ 3.11.4
 - SQLite (or another relational database if you adapt the code)  
 - `uv` for dependencies  
 
-### Installation steps
-0. Install UV
-```curl -LsSf https://astral.sh/uv/install.sh | sh```
+### Installation Steps
+0. Install UV:
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
 
 
 1. Sync dependencies:
@@ -50,7 +52,7 @@ This project contains a dashboard that relies on an internally created sql datab
 2. Initialize the database:
 
     ```bash
-    python database.py
+    python utils/database.py
     ```
 
    This will create the relational schema (e.g., tables) in a local SQLite database.
@@ -59,7 +61,7 @@ This project contains a dashboard that relies on an internally created sql datab
 
 ## Database Schema
 
-Here is a summary of the relational design (contained in `database.py`).
+Here is a summary of the relational design (contained in `utils/database.py`).
 
 **Tables:**
 
@@ -93,32 +95,34 @@ Here is a summary of the relational design (contained in `database.py`).
 
 
 **Rationale & Scaling:**
-It separates subject-level metadata from sample-level measurements
+It separates subject-level metadata from sample-level measurements:
 
 1. Clean separation of subjects and samples
     - Subjects belong to projects.
     - Samples belong to subjects.
     - This creates a clear 1-to-many relationship.
 
-- **Scalability:** The current method should scale nicely. If you scale to *hundreds of projects* and *millions of samples*, I would have a "metadata" table for each project potentially.
+- **Scalability:** The current method should scale nicely. If scaling to *hundreds of projects* and *millions of samples*, I would consider having a separate "metadata" table for each project.
 
 ---
 
 ## Code Structure
 
-First, we have the `data/` folder containing the original data and the sql database. Then to keep things simple we have a `utils/` folder that consists of utils for setuping the database and the dashboard. Then we have the main app. I also included `tests/` that contain unit tests for the database and main data loader, because these where the most important pieces. Note: *With more time I would add more unit tests for the rest of the important utils*
+First, we have the `data/` folder containing the original data and the SQL database. To keep things simple, we have a `utils/` folder that consists of utilities for setting up the database and the dashboard. Then we have the main app. I also included `tests/` that contain unit tests for the database and main data loader, as these were the most important pieces. 
+
+**Note:** *With more time I would add more unit tests for the rest of the important utils.*
 
 ```
 teiko_technical/
 │
 ├── tests/
-│   ├── test_database.py     # Unit tests the creation of the database
+│   ├── test_database.py     # Unit tests for the creation of the database
 │   └── test_load_data.py    # Unit tests for the main data loading function
 │
 ├── utils/
 │   ├── database.py          # Database connection + schema creation
 │   ├── load_data.py         # Main helper functions for retrieving data
-│   ├── path_constants.py    # Contains pathway constants
+│   ├── path_constants.py    # Contains path constants
 │   ├── plotting.py          # Main Plotting Object for box plots in the dashboard
 │   └── stats.py             # Main helper functions for calculating stats in the box plots
 │
@@ -127,7 +131,7 @@ teiko_technical/
 │
 ├── data/
 │   ├── cell_counts.db         
-│   └── cell-count.csv         # Data that leads to the cell_counts sqllite database
+│   └── cell-count.csv         # Data that leads to the cell_counts SQLite database
 │
 ├── dashboard.py             # Main Dash application with requested results
 │
@@ -150,12 +154,12 @@ Here are the main pieces of functionality and how to run them:
    ```bash
    uv run python rel_freq_table.py
    ```
-   **Note**: Most the analytics and results are computed directly in the dashboard.
+   **Note:** Most of the analytics and results are computed directly in the dashboard.
 
 ## Dashboard ([Link](https://teiko-technical.onrender.com/))
 The dashboard answers the questions for parts 2-4. 
 
-**Note:** For the statistical analysis (part 3), I’ve worked with enough clinicians and data scientists to know that everyone uses slightly different thresholds for what counts as a “statistically significant” difference. Instead of labeling results as significant, I report the full statistics for each comparison so that end users (whether clinicians or bioinformaticians) can apply their own internal criteria.
+**Note:** For the statistical analysis (part 3), I've worked with enough clinicians and data scientists to know that everyone uses slightly different thresholds for what counts as a "statistically significant" difference. Instead of labeling results as significant, I report the full statistics for each comparison so that end users (whether clinicians or bioinformaticians) can apply their own internal criteria.
 
-## Last Note
-I acknowledge that this repo is not a prefect and has areas for improvments
+**Last Note:**
+I acknowledge that this repo is not perfect and has areas for improvement.

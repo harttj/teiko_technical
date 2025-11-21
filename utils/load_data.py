@@ -1,3 +1,10 @@
+"""
+Utilities for loading and querying data from the SQLite database.
+
+This module provides helper functions to retrieve sample and metadata
+columns from the database, handling joins and column resolution.
+"""
+
 import sqlite3
 from pathlib import Path
 

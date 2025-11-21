@@ -1,3 +1,11 @@
+"""
+Controller and helpers for generating dashboard visualizations.
+
+This module contains the PlotController class, which encapsulates
+logic for filtering data, determining sort orders, building Plotly
+figures, and annotating plots with statistical results.
+"""
+
 from typing import List, Optional
 
 import numpy as np
@@ -13,6 +21,12 @@ class PlotController:
     def __init__(
         self, df: pd.DataFrame, population_cols: Optional[List[str]] = None
     ) -> None:
+        """
+        Initialize the PlotController.
+
+        :param df: The dataframe containing the data.
+        :param population_cols: Optional list of population columns.
+        """
         self._df = df.copy()
         self.population_cols = list(population_cols) if population_cols else None
 
@@ -23,6 +37,15 @@ class PlotController:
         treatment: Optional[str],
         sample_type: Optional[str],
     ) -> pd.DataFrame:
+        """
+        Filter the dataframe based on the provided criteria.
+
+        :param population: The population to filter by.
+        :param condition: The condition to filter by.
+        :param treatment: The treatment to filter by.
+        :param sample_type: The sample type to filter by.
+        :return: A filtered DataFrame.
+        """
         dff = self._df
         if population is not None:
             dff = dff[dff["population"] == population]
@@ -37,6 +60,14 @@ class PlotController:
     def determine_category_order(
         self, df: pd.DataFrame, x_col: str, prefer_numeric: bool = False
     ) -> Optional[List[str]]:
+        """
+        Determine the order of categories for the x-axis.
+
+        :param df: The dataframe to determine order from.
+        :param x_col: The column name for the x-axis.
+        :param prefer_numeric: Whether to prefer numeric ordering.
+        :return: A list of strings representing the category order, or None.
+        """
         # If a numeric time column exists and numeric ordering is requested, attempt numeric sort
         if x_col == "timepoint" and "time_from_treatment_start" in df.columns:
             try:
@@ -64,6 +95,18 @@ class PlotController:
         category_order: Optional[List[str]] = None,
         show_points: bool = True,
     ):
+        """
+        Build a box plot figure.
+
+        :param df: The dataframe containing the data.
+        :param x_col: The column name for the x-axis.
+        :param y_col: The column name for the y-axis.
+        :param color_col: The column name for color grouping.
+        :param title: The title of the plot.
+        :param category_order: The order of categories.
+        :param show_points: Whether to show individual data points.
+        :return: A Plotly figure object.
+        """
         color_arg = color_col if (color_col and color_col in df.columns) else None
         points_arg = "all" if show_points else False
         cat_orders = {x_col: category_order} if category_order is not None else None
@@ -87,6 +130,16 @@ class PlotController:
         response_col: str = "response",
         responder_val: str = "yes",
     ) -> Optional[pd.DataFrame]:
+        """
+        Compute statistics for the data.
+
+        :param df: The dataframe containing the data.
+        :param group_col: The column to group by.
+        :param value_col: The column containing values to analyze.
+        :param response_col: The column containing response labels.
+        :param responder_val: The value indicating a responder.
+        :return: A DataFrame containing statistics, or None if computation fails.
+        """
         if response_col not in df.columns:
             return None
         try:
@@ -103,6 +156,14 @@ class PlotController:
     def annotate_ticks(
         self, fig, tickvals: List[str], stats_df: pd.DataFrame, stats_group_col: str
     ) -> None:
+        """
+        Annotate the x-axis ticks with statistics.
+
+        :param fig: The Plotly figure to annotate.
+        :param tickvals: The values for the x-axis ticks.
+        :param stats_df: The dataframe containing statistics.
+        :param stats_group_col: The column in stats_df matching the tick values.
+        """
         if stats_df is None:
             return
         try:

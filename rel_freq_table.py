@@ -1,3 +1,11 @@
+"""
+Script to calculate relative frequencies of cell populations.
+
+This module contains functions to process raw cell count data and
+compute the percentage of each cell type relative to the total count
+per sample.
+"""
+
 import os
 import sqlite3
 
@@ -15,7 +23,14 @@ def get_rel_freq_table(
     population_cols: list[str] = POPULATION_COLS,
     sample_code_col: str = SAMPLE_CODE_COL,
 ) -> pd.DataFrame:
-    """Get the relative frequency table of cell counts."""
+    """
+    Get the relative frequency table of cell counts.
+
+    :param df: The input dataframe containing cell counts.
+    :param population_cols: List of column names representing cell populations.
+    :param sample_code_col: The column name for sample codes.
+    :return: A DataFrame with relative frequencies.
+    """
     # determine id columns (metadata + sample_code)
     id_cols = list(set([col for col in df.columns if col not in population_cols]))
 

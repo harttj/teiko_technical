@@ -1,3 +1,10 @@
+"""
+Tests for the data loading utilities.
+
+This module contains tests for the load_data module, verifying that
+data can be correctly retrieved from the SQLite database.
+"""
+
 import sqlite3
 import sys
 import types

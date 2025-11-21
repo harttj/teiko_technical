@@ -1,3 +1,11 @@
+"""
+Main Dash application for visualizing cell frequency data.
+
+This module defines the layout and callbacks for the Loblaw's Dashboard,
+allowing users to explore relative cell frequencies across different
+conditions, treatments, and timepoints.
+"""
+
 from typing import List, Optional
 
 import numpy as np
@@ -201,6 +209,14 @@ app.layout = [
     Input("sampletype-dropdown", "value"),
 )
 def update_allpop_plot(condition_value, treatment_value, sampletype_value):
+    """
+    Update the all-population boxplot based on selected filters.
+
+    :param condition_value: The selected condition from the dropdown.
+    :param treatment_value: The selected treatment from the dropdown.
+    :param sampletype_value: The selected sample type from the dropdown.
+    :return: A Plotly figure object for the boxplot.
+    """
     dff = controller.filter_df(None, condition_value, treatment_value, sampletype_value)
     if dff.empty:
         return px.box(title="No data for selected filters")
@@ -249,6 +265,15 @@ def update_allpop_plot(condition_value, treatment_value, sampletype_value):
 def update_timepoint_box(
     population_value, condition_value, treatment_value, sampletype_value
 ):
+    """
+    Update the timepoint boxplot based on selected filters.
+
+    :param population_value: The selected population from the dropdown.
+    :param condition_value: The selected condition from the dropdown.
+    :param treatment_value: The selected treatment from the dropdown.
+    :param sampletype_value: The selected sample type from the dropdown.
+    :return: A Plotly figure object for the timepoint boxplot.
+    """
     if population_value is None:
         return px.box(title="No population selected")
 
@@ -311,6 +336,16 @@ def update_subset_analysis_note(
     treatment_value,
     sampletype_value,
 ):
+    """
+    Update the subset analysis note based on selected filters.
+
+    :param timepoint_value: The selected timepoint from the dropdown.
+    :param population_value: The selected population from the dropdown.
+    :param condition_value: The selected condition from the dropdown.
+    :param treatment_value: The selected treatment from the dropdown.
+    :param sampletype_value: The selected sample type from the dropdown.
+    :return: A Dash HTML component containing the analysis note.
+    """
     dff = controller.filter_df(
         population_value, condition_value, treatment_value, sampletype_value
     ).copy()
