@@ -10,6 +10,9 @@ from rel_freq_table import POPULATION_COLS, SAMPLE_CODE_COL, get_rel_freq_table
 from utils.load_data import get_data
 from utils.plotting import PlotController
 
+app = Dash()
+server = app.server
+
 # Load data (same approach as original)
 whole_df = get_data(sample_cols="*", metadata_cols="*")
 rel_freq_df = get_rel_freq_table(whole_df)
@@ -20,10 +23,6 @@ rel_freq_df_subset = rel_freq_df[
 
 # Instantiate controller with shared dataframe
 controller = PlotController(rel_freq_df, population_cols=POPULATION_COLS)
-
-
-app = Dash()
-
 
 app.layout = [
     html.H2(children="Loblaw's Dashboard", style={"textAlign": "center"}),
