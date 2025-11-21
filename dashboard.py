@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -6,84 +8,21 @@ from scipy import stats
 
 from rel_freq_table import POPULATION_COLS, SAMPLE_CODE_COL, get_rel_freq_table
 from utils.load_data import get_data
+from utils.plotting import PlotController
 
+app = Dash()
+server = app.server
+
+# Load data (same approach as original)
 whole_df = get_data(sample_cols="*", metadata_cols="*")
-print(whole_df.head())
-
 rel_freq_df = get_rel_freq_table(whole_df)
 
 rel_freq_df_subset = rel_freq_df[
     ["sample_code", "total_count", "population", "count", "percentage"]
 ]
 
-
-def compute_welch_bh(
-    df, group_col, value_col="percentage", response_col="response", responder_val="yes"
-):
-    """Compute Welch two-sample t-test (responder vs non-responder) per group and apply BH correction.
-
-    Returns a DataFrame with columns: group, t_stat, p_value, p_adj
-    """
-    groups = []
-    t_stats = []
-    p_values = []
-
-    # get unique groups in order
-    unique_groups = list(df[group_col].dropna().unique())
-    for g in unique_groups:
-        sub = df[df[group_col] == g]
-        grp1 = sub[sub[response_col] == responder_val][value_col].dropna().astype(float)
-        grp2 = sub[sub[response_col] != responder_val][value_col].dropna().astype(float)
-
-        if len(grp1) < 2 or len(grp2) < 2:
-            groups.append(g)
-            t_stats.append(np.nan)
-            p_values.append(np.nan)
-            continue
-
-        try:
-            tstat, pval = stats.ttest_ind(
-                grp1, grp2, equal_var=False, nan_policy="omit"
-            )
-        except Exception:
-            tstat, pval = np.nan, np.nan
-
-        groups.append(g)
-        t_stats.append(float(tstat) if not np.isnan(tstat) else np.nan)
-        p_values.append(float(pval) if not np.isnan(pval) else np.nan)
-
-    # Benjamini-Hochberg across the available p-values (ignore NaNs)
-    p_arr = np.array(p_values, dtype=float)
-    m = np.sum(~np.isnan(p_arr))
-    p_adj = np.array([np.nan] * len(p_arr))
-    if m > 0:
-        # BH procedure
-        idx = np.where(~np.isnan(p_arr))[0]
-        p_nonan = p_arr[idx]
-        order = np.argsort(p_nonan)
-        ranks = np.empty_like(order)
-        ranks[order] = np.arange(1, len(p_nonan) + 1)
-        # compute adjusted p-values
-        adj = p_nonan * len(p_nonan) / ranks
-        # enforce monotonicity
-        adj_sorted = np.minimum.accumulate(adj[::-1])[::-1]
-        adj_sorted = np.clip(adj_sorted, 0, 1)
-        p_adj_vals = adj_sorted
-        p_adj[idx] = p_adj_vals
-
-    res = pd.DataFrame(
-        {
-            group_col: groups,
-            "t_stat": t_stats,
-            "p_value": p_values,
-            "p_adj": p_adj,
-        }
-    )
-    return res
-
-
-app = Dash()
-
+# Instantiate controller with shared dataframe
+controller = PlotController(rel_freq_df, population_cols=POPULATION_COLS)
 
 app.layout = [
     html.H2(children="Loblaw's Dashboard", style={"textAlign": "center"}),
@@ -99,7 +38,6 @@ app.layout = [
                         columns=[
                             {"name": i, "id": i} for i in rel_freq_df_subset.columns
                         ],
-                        # --- Interactive features ---
                         filter_action="native",
                         sort_action="native",
                         sort_mode="multi",
@@ -115,7 +53,6 @@ app.layout = [
         ],
         style={"width": "80%", "margin": "auto"},
     ),
-    # Top filters (metadata filters) - affect both plots
     html.Div(
         [
             html.Div(
@@ -195,12 +132,10 @@ app.layout = [
         ],
         style={"width": "80%", "margin": "1rem auto"},
     ),
-    # Top plot: boxplot across all populations (x-axis = population)
     html.Div(
         [dcc.Graph(id="boxplot-allpop-graph")],
         style={"width": "80%", "margin": "1rem auto"},
     ),
-    # Population selector (placed between the two plots)
     html.Div(
         [
             html.Label("Select population:"),
@@ -232,10 +167,29 @@ app.layout = [
         ],
         style={"width": "80%", "margin": "1rem auto", "textAlign": "left"},
     ),
-    # Bottom plot: boxplot for the selected single population
     html.Div(
         [dcc.Graph(id="boxplot-for-timepoints")],
         style={"width": "80%", "margin": "1rem auto"},
+    ),
+    html.Div(
+        [
+            # FIXME: Admittedly the time point doesn't change the stats this is probably a bug
+            html.Label("Select timepoint :"),
+            dcc.Dropdown(
+                id="timepoint-dropdown",
+                options=[
+                    {"label": str(p), "value": p}  # value is numeric
+                    for p in sorted(
+                        rel_freq_df["time_from_treatment_start"].dropna().unique()
+                    )
+                ],
+                value=0,  # default numeric value
+                clearable=False,
+                style={"width": "20rem"},
+            ),
+            html.Div(id="subset-analysis-note"),
+        ],
+        style={"width": "80%", "margin": "1rem auto", "textAlign": "left"},
     ),
 ]
 
@@ -247,67 +201,40 @@ app.layout = [
     Input("sampletype-dropdown", "value"),
 )
 def update_allpop_plot(condition_value, treatment_value, sampletype_value):
-    """Top plot: show percentage distributions across all populations (x = population)."""
-    dff = rel_freq_df
-    if condition_value:
-        dff = dff[dff["condition"] == condition_value]
-    if treatment_value:
-        dff = dff[dff["treatment"] == treatment_value]
-    if sampletype_value:
-        dff = dff[dff["sample_type"] == sampletype_value]
-
+    dff = controller.filter_df(None, condition_value, treatment_value, sampletype_value)
     if dff.empty:
         return px.box(title="No data for selected filters")
 
-    # ensure population order: prefer POPULATION_COLS if available
     pop_order = (
-        POPULATION_COLS if POPULATION_COLS else sorted(dff["population"].unique())
+        controller.population_cols
+        if controller.population_cols
+        else [str(p) for p in sorted(dff["population"].unique())]
     )
 
-    fig = px.box(
+    fig = controller.build_box_figure(
         dff,
-        x="population",
-        y="percentage",
-        color="response" if "response" in dff.columns else None,
-        category_orders={"population": pop_order},
-        hover_data=[],
-        title="Percentage distribution across populations",
+        x_col="population",
+        y_col="percentage",
+        color_col="response" if "response" in dff.columns else None,
+        title="",
+        category_order=pop_order,
+        show_points=False,
     )
-    fig.update_layout(xaxis_title="Population", yaxis_title="Relative Freq (%)")
-
-    # compute welch t-tests per population and BH-correct across populations
-    stats_df = None
-    try:
-        stats_df = compute_welch_bh(
-            dff,
-            group_col="population",
-            value_col="percentage",
-            response_col="response",
-            responder_val="yes",
+    fig.update_layout(
+        xaxis_title="Cell Population Type", yaxis_title="Relative Freq (%)"
+    )
+    fig.update_layout(
+        title=(
+            "<b>Relative Cell Frequencies in Responders vs Non-Responders</b><br>"
+            "('t' value is from Welch's t-test, and 'd' value is Cohen's d for responders vs non-responders)"
         )
-    except Exception:
-        stats_df = None
+    )
 
+    stats_df = controller.compute_stats(dff, group_col="population")
     if stats_df is not None:
-        tickvals = pop_order
-        labels = []
-        stats_map = stats_df.set_index("population")
-        for tv in tickvals:
-            if tv in stats_map.index:
-                row = stats_map.loc[tv]
-                pval = row.get("p_value", np.nan)
-                p_adj = row.get("p_adj", np.nan)
-                tval = row.get("t_stat", np.nan)
-                if np.isnan(p_adj):
-                    label = f"{tv}<br>n/a"
-                else:
-                    label = f"{tv}<br>p={pval:.3g}, adj_p={p_adj:.6g}, t={tval:.2f}"
-            else:
-                label = f"{tv}<br>n/a"
-            labels.append(label)
-        fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=labels)
-        # prevent hover showing the x tick text (which contains p/t); show only y
-        fig.update_traces(hovertemplate="%{y}<extra></extra>")
+        controller.annotate_ticks(
+            fig, pop_order, stats_df, stats_group_col="population"
+        )
 
     return fig
 
@@ -322,23 +249,12 @@ def update_allpop_plot(condition_value, treatment_value, sampletype_value):
 def update_timepoint_box(
     population_value, condition_value, treatment_value, sampletype_value
 ):
-    """Update the boxplot (with points) for the selected population.
-
-    x-axis will be timepoints (or sample_code fallback). For each x-tick we run
-    a Welch t-test (responder vs non-responder) and BH-correct across ticks.
-    The adjusted p-value and t-statistic are appended under each x-tick label.
-    """
     if population_value is None:
         return px.box(title="No population selected")
 
-    # filter by population and metadata filters
-    dff = rel_freq_df[rel_freq_df["population"] == population_value]
-    if condition_value:
-        dff = dff[dff["condition"] == condition_value]
-    if treatment_value:
-        dff = dff[dff["treatment"] == treatment_value]
-    if sampletype_value:
-        dff = dff[dff["sample_type"] == sampletype_value]
+    dff = controller.filter_df(
+        population_value, condition_value, treatment_value, sampletype_value
+    )
     if dff.empty:
         return px.box(title=f"No data for population: {population_value}")
 
@@ -346,74 +262,124 @@ def update_timepoint_box(
     if "time_from_treatment_start" in dff.columns:
         dff["timepoint"] = dff["time_from_treatment_start"].astype(str)
         x_col = "timepoint"
-        # try to preserve numeric order for timepoints
-        try:
-            time_order = sorted(
-                dff["time_from_treatment_start"].dropna().unique(),
-                key=lambda v: float(v),
-            )
-            category_order = [str(t) for t in time_order]
-        except Exception:
-            category_order = sorted(dff["timepoint"].unique())
+        category_order = controller.determine_category_order(
+            dff, x_col="timepoint", prefer_numeric=True
+        )
     else:
-        x_col = "sample_code"
+        x_col = SAMPLE_CODE_COL if SAMPLE_CODE_COL else "sample_code"
         category_order = None
 
-    # create boxplot without individual points
-    fig = px.box(
+    fig = controller.build_box_figure(
         dff,
-        x=x_col,
-        y="percentage",
-        color="response" if "response" in dff.columns else None,
-        points=False,
-        hover_data=[],
-        title=f"Percentage distribution for {population_value}",
-        category_orders={x_col: category_order} if category_order is not None else None,
+        x_col=x_col,
+        y_col="percentage",
+        color_col="response" if "response" in dff.columns else None,
+        title="",
+        category_order=category_order,
+        show_points=False,
     )
     fig.update_layout(
         xaxis_title="Time from treatment start (in hours)",
         yaxis_title="Relative Freq (%)",
     )
-
-    # compute tests per x-tick and annotate x-tick labels
-    stats_df = None
-    try:
-        stats_df = compute_welch_bh(
-            dff,
-            group_col=x_col,
-            value_col="percentage",
-            response_col="response",
-            responder_val="yes",
+    fig.update_layout(
+        title=(
+            f"<b>Relative {population_value} Frequencies in Responders vs Non-Responders Across Timepoints</b><br>"
+            "('t' value is from Welch's t-test, and 'd' value is Cohen's d for responders vs non-responders)"
         )
-    except Exception:
-        stats_df = None
+    )
 
+    stats_df = controller.compute_stats(dff, group_col=x_col)
     if stats_df is not None and category_order is not None:
-        tickvals = category_order
-        labels = []
-        stats_map = (
-            stats_df.set_index(x_col)
-            if x_col in stats_df.columns
-            else stats_df.set_index(stats_df.columns[0])
-        )
-        for tv in tickvals:
-            if tv in stats_map.index:
-                row = stats_map.loc[tv]
-                pval = row.get("p_value", np.nan)
-                p_adj = row.get("p_adj", np.nan)
-                tval = row.get("t_stat", np.nan)
-                if np.isnan(p_adj):
-                    label = f"{tv}<br>n/a"
-                else:
-                    label = f"{tv}<br>p={pval:.3g}, adj_pval={p_adj:.3g}, t={tval:.2f}"
-            else:
-                label = f"{tv}<br>n/a"
-            labels.append(label)
-        fig.update_xaxes(tickmode="array", tickvals=tickvals, ticktext=labels)
-        # prevent hover showing the x tick text (which contains p/t); show only y
-        fig.update_traces(hovertemplate="%{y}<extra></extra>")
+        controller.annotate_ticks(fig, category_order, stats_df, stats_group_col=x_col)
 
     return fig
+
+
+@callback(
+    Output("subset-analysis-note", "children"),
+    Input("timepoint-dropdown", "value"),
+    Input("population-dropdown", "value"),
+    Input("condition-dropdown", "value"),
+    Input("treatment-dropdown", "value"),
+    Input("sampletype-dropdown", "value"),
+)
+def update_subset_analysis_note(
+    timepoint_value,
+    population_value,
+    condition_value,
+    treatment_value,
+    sampletype_value,
+):
+    dff = controller.filter_df(
+        population_value, condition_value, treatment_value, sampletype_value
+    ).copy()
+    if dff.empty:
+        return html.H5("No data for selected filters.")
+
+    print(len(dff))
+    print(
+        dff["time_from_treatment_start"].value_counts(),
+        dff["time_from_treatment_start"].dtypes,
+    )
+
+    dff_tp = dff[dff["time_from_treatment_start"] == timepoint_value].copy()
+    print(timepoint_value, type(timepoint_value))
+    print(
+        dff_tp["time_from_treatment_start"].unique(),
+        dff_tp["time_from_treatment_start"].dtypes,
+    )
+    print(len(dff_tp))
+
+    # Build structured output: only the leading label is bold
+    header = html.H1(
+        [
+            html.B("Subset Analysis: "),
+            f"{population_value} — condition: {condition_value} | treatment: {treatment_value} | sample type: {sampletype_value} | timepoint: {timepoint_value}",
+        ],
+        style={"color": "#2C3E50"},
+    )
+    stats_lines = html.Div(
+        [
+            html.Span(
+                [
+                    html.B("Number of samples per project: "),
+                    f"{dff_tp['project'].nunique()}",
+                ]
+            ),
+            html.Br(),
+            html.Span(
+                [
+                    html.B("Number of responder subjects: "),
+                    f"{dff_tp[dff_tp['response'] == 'yes']['subject'].nunique()}",
+                ]
+            ),
+            html.Br(),
+            html.Span(
+                [
+                    html.B("Number of non-responder subjects: "),
+                    f"{dff_tp[dff_tp['response'] == 'no']['subject'].nunique()}",
+                ]
+            ),
+            html.Br(),
+            html.Span(
+                [
+                    html.B("Number of male subjects: "),
+                    f"{dff_tp[dff_tp['sex'] == 'M']['subject'].nunique()}",
+                ]
+            ),
+            html.Br(),
+            html.Span(
+                [
+                    html.B("Number of female subjects: "),
+                    f"{dff_tp[dff_tp['sex'] == 'F']['subject'].nunique()}",
+                ]
+            ),
+        ],
+        style={"fontSize": "1.5rem", "color": "#34495E"},
+    )
+
+    return html.Div([header, stats_lines], style={"paddingTop": "0.25rem"})
 
 
 if __name__ == "__main__":
