@@ -3,13 +3,12 @@
 
 Schema design (simple, normalized):
 - `metadata`: one row per subject (project+subject)
-- `samples`: one row per sample with time and cell counts, FK -> metadata
+- `samples`: one row per sample with time and cell counts, FK -> metadata_id
 
 Only `sample` is a globally unique identifier for measurements; the
 `metadata` table keeps subject-level fields. By default we keep a
 UNIQUE(project, subject) constraint to avoid accidental duplicated metadata
-rows — remove this constraint if you need multiple metadata rows per
-project+subject.
+rows.
 """
 
 from __future__ import annotations
